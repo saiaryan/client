@@ -1,14 +1,73 @@
 import React, { useState } from "react";
 
 const Login = () => {
-	const [islogin, setIsLogin] = useState(true)
+	const [islogin, setIsLogin] = useState(true);
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupNumber, setSignupNumber] = useState("");
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [error, setError] = useState("");
   const handleSignup = () => {
     setIsLogin(false)
   };
 
-  const handleLogin = () => {
-		
+  const handleLogin = async() => {
+		if (!loginUsername) {
+      setError("Username is required");
+      return;
+    }
+    if (!loginPassword) {
+      setError("Password is required");
+      return;
+    }
+    const response = await fetch("http://localhost:5001/api/users/login", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        userName: loginUsername,
+        password: loginPassword
+      })
+    });
+    console.log("response", response);
   };
+
+  const handleSignupSubmit = async () => {
+    if (!signupName) {
+      setError("Name is required");
+      return;
+    }
+    if (!signupNumber) {
+      setError("Number is required");
+      return;
+    }
+    if (!signupEmail) {
+      setError("Email is required");
+      return;
+    }
+    if (!signupPassword) {
+      setError("Password is required");
+      return;
+    }
+    const response = await fetch("http://localhost:5001/api/users/signup", {
+       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: signupName,
+        email: signupEmail,
+        phoneNumber: signupNumber,
+        password: signupPassword
+      }),
+    })
+    console.log("response==========", response);
+  }
+
 
   return (
     // Page: full screen, card centered both ways
@@ -23,7 +82,8 @@ const Login = () => {
       }}
     >
     
-      <div
+      <form
+        onSubmit={islogin ? handleLogin : handleSignupSubmit}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -49,6 +109,10 @@ const Login = () => {
 				{
 					islogin ? <>
 					<input
+          onChange={(e) => {
+            setError("")
+            setLoginUsername(e.target.value)
+          }}
           placeholder="Email"
           type="email"
           style={{
@@ -60,6 +124,10 @@ const Login = () => {
           }}
         />
         <input
+          onChange={(e) => {
+             setError("")
+            setLoginPassword(e.target.value)
+          }}
           placeholder="Password"
           type="password"
           style={{
@@ -73,6 +141,7 @@ const Login = () => {
 
         {/* Primary button: filled, strong colour */}
         <button
+         type="button"
           onClick={handleLogin}
           style={{
             height: "50px",
@@ -89,6 +158,7 @@ const Login = () => {
           Login
         </button>
 				<button
+         type="button"
           onClick={handleSignup}
           style={{
             height: "50px",
@@ -108,6 +178,10 @@ const Login = () => {
 					<input
           placeholder="Name"
           type="text"
+          onChange={(e) => {
+            setError("");
+            setSignupName(e.target.value)
+          }}
           style={{
             height: "50px",
             padding: "0 12px",
@@ -118,6 +192,10 @@ const Login = () => {
         />
 				<input
           placeholder="PhoneNumber"
+          onChange={(e) => {
+            setError("");
+            setSignupNumber(e.target.value)
+          }}
           type="tel"
           style={{
             height: "50px",
@@ -128,6 +206,10 @@ const Login = () => {
           }}
         />
 				<input
+         onChange={(e) => {
+          setError("");
+          setSignupEmail(e.target.value)
+        }}
           placeholder="Email"
           type="email"
           style={{
@@ -138,8 +220,24 @@ const Login = () => {
             fontSize: "15px",
           }}
         />
+        <input
+         onChange={(e) => {
+          setError("");
+          setSignupPassword(e.target.value)
+        }}
+          placeholder="Password"
+          type="password"
+          style={{
+            height: "50px",
+            padding: "0 12px",
+            border: "1px solid #d1d5db",
+            borderRadius: "10px",
+            fontSize: "15px",
+          }}
+        />
 				<button
-          onClick={handleLogin}
+        type="button"
+          onClick={handleSignupSubmit}
           style={{
             height: "50px",
             marginTop: "8px",
@@ -153,6 +251,7 @@ const Login = () => {
           }}
         >Signup</button>
 					<button
+          type="button"
           onClick={() => setIsLogin(true)}
           style={{
             height: "50px",
@@ -168,8 +267,9 @@ const Login = () => {
           Back To Login
         </button>
 					</>
-				}      
-      </div>
+				}
+        <h4 style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'red' }}>{error}</h4>
+      </form>
     </div>
   );
 };
